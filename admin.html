@@ -1,0 +1,30 @@
+<html>
+    <head>
+		<title>{% block title %}SWSB Admin{% end %}</title>
+    </head>
+    <body>
+		{% import time %}
+		<p>
+		    Topics ({{ len(TopicManager.Topics) }}):<br/>
+		    <table>
+			<tr>
+			    <th>ID</th>
+			    <th>Created on</th>
+			    <th>Clients</th>
+			</tr>
+			{% for topic in TopicManager.Topics.values() %}
+			<tr>
+			    <td>{{ topic.ID }}</td>
+			    <td>{{ topic.CreatedOn }}</td>
+			    <td>
+			    {{ len(topic.Clients) }}
+		    	{% for client in topic.Clients.values() %}
+		    		{{ client.IP }} ({{ client.SocketKey }}),
+		    	{% end %}
+			    </td>
+			</tr>
+			{% end %}
+		    </table>
+		</p>
+    </body>
+</html>
