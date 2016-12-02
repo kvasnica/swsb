@@ -1,6 +1,8 @@
 # swsb
 Simple WebSocket Broker
 
+[![Code Climate](https://codeclimate.com/github/kvasnica/swsb/badges/gpa.svg)](https://codeclimate.com/github/kvasnica/swsb)
+
 ## Build for Docker
 ```
 docker build -t kvasnica/swsb .
