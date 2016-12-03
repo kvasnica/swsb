@@ -1,7 +1,10 @@
-FROM python:3-onbuild
+FROM python:3-alpine
 MAINTAINER Michal Kvasnica <michal.kvasnica@gmail.com>
 
 WORKDIR /root
+COPY requirements.txt /root/
+RUN pip install -r requirements.txt
+
 COPY swsb.py /root/
 EXPOSE 8025
 ENTRYPOINT ["python", "swsb.py"]
