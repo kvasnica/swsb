@@ -7,9 +7,6 @@ Copyright (c) 2014-2016 Michal Kvasnica, michal.kvasnica@gmail.com
 import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
-import tornado.web
-import tornado.template
-import json
 import logging
 import argparse
 from datetime import datetime
@@ -26,12 +23,6 @@ parser.add_argument('--statusperiod', '-s', default=3600, type=int,
     help='status report period in seconds (default is 3600)')
 parser.add_argument('--cleanupperiod', '-c', default=3600, type=int,
     help='cleanup period in seconds (default is 3600)')
-parser.add_argument('--hostname', '-n',
-    help='hostname of the server including protocol for cross-domain ajax')
-parser.add_argument('--password', '-w',
-    help='password for admin access (if undefined, admin access is disabled)')
-
-"letmein"
 args = parser.parse_args()
 
 logging.basicConfig(
@@ -213,33 +204,6 @@ class WSEchoHandler(tornado.websocket.WebSocketHandler):
         # receives data from the socket
         self.write_message(message)
 
-class AdminHandler(tornado.web.RequestHandler):
-    def get(self):
-        pin = self.get_argument("pw", "")
-        if not args.password or pin != args.password:
-            self.send_error(403)
-            return
-        self.render("./admin.html", TopicManager=TopicManager)
-
-class TopicHandler(tornado.web.RequestHandler):
-    def set_default_headers(self):
-        if args.hostname:
-            self.set_header("Access-Control-Allow-Origin", SWSB_HOST)
-
-    def get(self, action, id=None):
-        if action=="remove":
-            if id in TopicManager.Topics.keys():
-                TopicManager.removeTopic(id, " (web request)")
-                self.write("Topic \"%s\" was removed." % id)
-            else:
-                self.write("No such topic \"%s\"" % id)
-
-        elif action=="list":
-            self.write(str(TopicManager.Topics.keys()))
-
-        else:
-            self.send_error(400)
-
 ClientManager = ClientManager()
 TopicManager = TopicManager()
 settings = {}
@@ -247,15 +211,10 @@ settings = {}
 application = tornado.web.Application([
     (r'/t/(.*)', WSHandler),
     (r'/test/echo', WSEchoHandler),
-    (r'/m/topic/(\w+)/(.*)', TopicHandler),
-    (r'/a', AdminHandler),
-    (r'/html/(.*)', tornado.web.StaticFileHandler, {'path': './html'}),
 ], **settings)
 
 if __name__ == "__main__":
     print("Simple websocket broker running on port %d..." % args.port)
-    if args.password:
-        print("Password: %s" % args.password)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(args.port)
     tornado.ioloop.PeriodicCallback(TopicManager.cleanup, CLEANUP_PERIOD*1000).start()
