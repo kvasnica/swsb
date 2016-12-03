@@ -253,13 +253,13 @@ application = tornado.web.Application([
 ], **settings)
 
 if __name__ == "__main__":
-    print "Simple websocket broker running on port %d..." % args.port
+    print("Simple websocket broker running on port %d..." % args.port)
     if args.password:
-        print "Password: %s" % args.password
+        print("Password: %s" % args.password)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(args.port)
     tornado.ioloop.PeriodicCallback(TopicManager.cleanup, CLEANUP_PERIOD*1000).start()
     tornado.ioloop.PeriodicCallback(ClientManager.status, STATUS_PERIOD*1000).start()
     tornado.ioloop.PeriodicCallback(TopicManager.status, STATUS_PERIOD*1000).start()
     tornado.ioloop.IOLoop.instance().start()
-    print "...done"
+    print("...done")
