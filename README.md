@@ -2,6 +2,7 @@
 Simple WebSocket Broker
 
 [![Code Climate](https://codeclimate.com/github/kvasnica/swsb/badges/gpa.svg)](https://codeclimate.com/github/kvasnica/swsb)
+[![Code Issues](https://www.quantifiedcode.com/api/v1/project/9d384ca2257c417a9b91cad10afde1bb/badge.svg)](https://www.quantifiedcode.com/app/project/9d384ca2257c417a9b91cad10afde1bb)
 
 ## Run via Docker
 ```
