@@ -10,6 +10,7 @@ import tornado.ioloop
 import logging
 import argparse
 from datetime import datetime
+import urllib
 
 # parse command-line inputs
 parser = argparse.ArgumentParser(description='Simple WebSockets Broker.')
@@ -23,6 +24,8 @@ parser.add_argument('--statusperiod', '-s', default=3600, type=int,
     help='status report period in seconds (default is 3600)')
 parser.add_argument('--cleanupperiod', '-c', default=3600, type=int,
     help='cleanup period in seconds (default is 3600)')
+parser.add_argument('--alloworigin', '-a', default='*', type=str,
+    help='allow cross-origin traffic from this domain (default is "*")')
 args = parser.parse_args()
 
 logging.basicConfig(
@@ -58,7 +61,7 @@ class Topic:
         # disconnect all connected clients
         logger.info("Shutting down topic \"%s\"%s", self.ID, reason)
         for client in self.Clients.values():
-            client.error("SWSB: Topic \"%s\" shuts down%s" % (self.ID, reason))
+            client.error('SWSB: Topic "{}" shuts down{}'.format(self.ID, reason))
             client.shutdown()
 
     def addClient(self, client):
@@ -180,6 +183,15 @@ class ClientManager:
         logger.info("Active clients: %d" % len(self.Clients))
 
 class WSHandler(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        if args.alloworigin=="*":
+            # accept all cross-origin traffic
+            return True
+        else:
+            # only accept traffic from domains ending with args.alloworigin
+            parsed_origin = urllib.parse.urlparse(origin)
+            return parsed_origin.netloc.endswith(args.alloworigin)
+
     def open(self, id):
         # creates the topic if necessary
         topic = TopicManager.getTopic(id)
@@ -215,6 +227,7 @@ application = tornado.web.Application([
 
 if __name__ == "__main__":
     print("Simple websocket broker running on port %d..." % args.port)
+    logger.info("Accepting requests from %s", args.alloworigin)
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(args.port)
     tornado.ioloop.PeriodicCallback(TopicManager.cleanup, CLEANUP_PERIOD*1000).start()

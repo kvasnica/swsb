@@ -39,4 +39,7 @@ optional arguments:
                         status report period in seconds (default is 3600)
   --cleanupperiod CLEANUPPERIOD, -c CLEANUPPERIOD
                         cleanup period in seconds (default is 3600)
+  --alloworigin ALLOWORIGIN, -a ALLOWORIGIN
+                        allow cross-origin traffic from this domain (default
+                        is "*")
 ```
