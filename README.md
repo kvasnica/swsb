@@ -42,4 +42,8 @@ optional arguments:
   --alloworigin ALLOWORIGIN, -a ALLOWORIGIN
                         allow cross-origin traffic from this domain (default
                         is "*")
+  --certfile CERTFILE, -r CERTFILE
+                        file that contains ssl certificate
+  --keyfile KEYFILE, -k KEYFILE
+                        file that contains ssl private key
 ```

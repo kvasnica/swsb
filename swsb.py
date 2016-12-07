@@ -26,6 +26,10 @@ parser.add_argument('--cleanupperiod', '-c', default=3600, type=int,
     help='cleanup period in seconds (default is 3600)')
 parser.add_argument('--alloworigin', '-a', default='*', type=str,
     help='allow cross-origin traffic from this domain (default is "*")')
+parser.add_argument('--certfile', '-r', default='', type=str,
+    help='file that contains ssl certificate')
+parser.add_argument('--keyfile', '-k', default='', type=str,
+    help='file that contains ssl private key')
 args = parser.parse_args()
 
 logging.basicConfig(
@@ -228,7 +232,17 @@ application = tornado.web.Application([
 if __name__ == "__main__":
     print("Simple websocket broker running on port %d..." % args.port)
     logger.info("Accepting requests from %s", args.alloworigin)
-    http_server = tornado.httpserver.HTTPServer(application)
+    if args.certfile:
+        ssl_options = { "certfile": args.certfile }
+        logger.info("Using SSL certificate...")
+        logger.info("certfile: %s", args.certfile)
+        if args.keyfile:
+            ssl_options["keyfile"] = args.keyfile
+            logger.info("keyfile: %s", args.keyfile)
+    else:
+        logger.info("Running unsecured...")
+        ssl_options = None
+    http_server = tornado.httpserver.HTTPServer(application, ssl_options=ssl_options)
     http_server.listen(args.port)
     tornado.ioloop.PeriodicCallback(TopicManager.cleanup, CLEANUP_PERIOD*1000).start()
     tornado.ioloop.PeriodicCallback(ClientManager.status, STATUS_PERIOD*1000).start()
