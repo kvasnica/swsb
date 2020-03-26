@@ -97,7 +97,7 @@ class TopicManager:
         return topic
 
     def removeTopic(self, id, reason=""):
-        logger.debug("TopicManager/createTopic: ID: %s, reason: %s", id, reason)
+        logger.debug("TopicManager/removeTopic: ID: %s, reason: %s", id, reason)
         topic = self.Topics[id]
         topic.shutdown(reason)
         self.Topics.pop(id, None)
